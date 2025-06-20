@@ -18,9 +18,7 @@ export default function LoginContainer() {
   return (
     <div className="flex flex-col md:grid md:grid-cols-2 h-screen">
       <div className="relative hidden md:flex flex-col w-full h-screen bg-[#243E80] items-center justify-center gap-8">
-        <div className="flex flex-col gap-2">
-          <p className="text-white text-2xl font-bold">Selamat Datang di Gacoan!</p>
-        </div>
+        <p className="text-white text-2xl font-bold">Selamat Datang di Gacoan!</p>
       </div>
 
       <div className="relative flex flex-col items-center justify-center w-full h-screen p-4 lg:p-8 bg-cover bg-center lg:bg-none bg-white">
