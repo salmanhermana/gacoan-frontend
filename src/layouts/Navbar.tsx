@@ -70,7 +70,7 @@ export default function Navbar() {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => handleClick("tenants")}
+          onClick={() => handleClick("menus")}
           className="absolute top-4 right-4 px-1.5 sm:right-6 md:right-8"
         >
           <Search size={16} />
@@ -173,7 +173,7 @@ export default function Navbar() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleClick("tenants")}
+            onClick={() => handleClick("menus")}
           >
             <Search size={16} />
           </Button>

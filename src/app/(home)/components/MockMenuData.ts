@@ -1,4 +1,4 @@
-import { Menu } from "@/types/tenant/menu";
+import { Menu } from "@/types/menu/menu";
 
 export const mockMenuData: { data: Menu[] } = {
     data: [
