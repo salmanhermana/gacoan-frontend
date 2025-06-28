@@ -4,15 +4,22 @@ import { FormProvider, useForm } from "react-hook-form";
 import Button from "@/components/buttons/Button";
 import Input from "@/components/form/Input";
 import { LoginRequest } from "@/types/auth/login";
+import withAuth from "@/components/hoc/withAuth";
+import useLoginMutation from "@/app/hooks/useLoginMutation";
 
-export default function LoginContainer() {
+export default withAuth(LoginContainer, "public");
+
+function LoginContainer() {
   const methods = useForm<LoginRequest>({
     mode: "onChange",
   });
 
   const { handleSubmit } = methods;
 
+  const { mutate: mutateLogin, isPending } = useLoginMutation();
+
   const onSubmit = (data: LoginRequest) => {
+    mutateLogin(data);
   };
 
   return (

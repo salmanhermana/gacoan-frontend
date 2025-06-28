@@ -5,7 +5,7 @@ export type LoginRequest = {
   
   export type LoginResponse = {
     data: {
-      token: string;
+      access_token: string;
       role: string;
     };
   };

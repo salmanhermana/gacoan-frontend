@@ -4,29 +4,16 @@ import { FormProvider, useForm } from "react-hook-form";
 import Button from "@/components/buttons/Button";
 import Input from "@/components/form/Input";
 import * as React from "react";
-
-type RegisterFormValues = {
-  name: string;
-  telephone: string;
-  email: string;
-  password: string;
-};
+import useCreateUserMutation, { CreateUserRequest } from "@/app/hooks/useCreateUserMutation";
 
 const Form = () => {
-  const methods = useForm<RegisterFormValues>();
+  const methods = useForm<CreateUserRequest>();
   const { handleSubmit } = methods;
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { mutate: createUser, isPending } = useCreateUserMutation();
 
-  const onSubmit = async (formData: RegisterFormValues) => {
-    try {
-      setIsSubmitting(true);
-
-    } catch (error) {
-      console.error("Error in form submission:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const onSubmit = async (data: CreateUserRequest) => {
+    createUser(data);
   };
 
   return (
@@ -71,7 +58,7 @@ const Form = () => {
           type="submit"
           className="w-full bg-[#243E80] hover:bg-[#1a2e5c] border-none cursor-pointer"
         >
-          {isSubmitting ? "Memproses..." : "Daftar"}
+          {isPending ? "Memproses..." : "Daftar"}
         </Button>
       </form>
     </FormProvider>

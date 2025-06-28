@@ -14,13 +14,14 @@ import UnstyledLink from "@/components/links/UnstyledLink";
 import clsxm from "@/lib/clsxm";
 import Link from "next/link";
 import Button from "@/components/buttons/Button";
+import useAuthStore from "@/app/stores/useAuthStore";
 
 const links = [{ href: "/", label: "" }];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
-  const user = true;
+  const { user } = useAuthStore();
 
   const pathname = usePathname();
 
@@ -90,7 +91,7 @@ export default function Navbar() {
                   >
                     Login
                   </ButtonLink>
-                ) : user ? (
+                ) : user?.role === "customer" ? (
                   <div className="flex gap-2">
                     <ButtonLink
                       variant="outline"
@@ -188,7 +189,7 @@ export default function Navbar() {
                 Login
               </ButtonLink>
             </>
-          ) : user ? (
+          ) : user?.role === "customer" ? (
             <div className="flex gap-2">
               <ButtonLink
                 variant="outline"
