@@ -42,10 +42,10 @@ export const useQueue = () => {
       setError(null);
       await kitchenApi.finishCooking({ queue_code: queueCode });
       setOrderStatus(OrderStatus.READY);
-      // Clear current queue after finishing
+      // Clear queue sekarang sebelum lanjut
       setTimeout(() => {
         setCurrentQueue(null);
-        fetchLowestQueue(); // Fetch next queue
+        fetchLowestQueue(); // fetch next queue
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to finish cooking');
@@ -56,7 +56,7 @@ export const useQueue = () => {
 
   useEffect(() => {
     fetchLowestQueue();
-    // Set up polling for real-time updates
+    // Setup polling buat update real-time 
     const interval = setInterval(fetchLowestQueue, 5000);
     return () => clearInterval(interval);
   }, [fetchLowestQueue]);

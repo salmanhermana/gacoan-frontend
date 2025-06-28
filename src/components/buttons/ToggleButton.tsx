@@ -24,7 +24,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
       setIsAvailable(newAvailability);
       onToggle?.(newAvailability);
     } catch (error) {
-      // Error handled by hook
+      // Error di handle hook
       console.error('Toggle failed:', error);
     }
   };

@@ -64,7 +64,7 @@ const OrderDashboardContainer: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <OrderCard
                   order={currentQueue}
-                  orderNumber={11} // This should come from API or be calculated
+                  orderNumber={11} // replace with API call
                   status={orderStatus}
                   timestamp="12:32:01"
                   onStartCooking={startCooking}

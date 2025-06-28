@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import MenuCard from '@/components/cards/MenuCard';
 import { Menu } from '@/types';
 
-// Mock data - replace with real API call
+// replace with real API call
 const mockMenus: (Menu & { is_available: boolean })[] = [
   { id: '1', name: 'MIE GACOAN LV 1', is_available: true },
   { id: '2', name: 'MIE GACOAN LV 1', is_available: false },
