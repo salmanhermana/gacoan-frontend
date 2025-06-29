@@ -1,6 +1,6 @@
 'use client';
 
-import { OrderStatus } from '@/types';
+import { OrderStatus } from '@/types/Order';
 
 interface OrderActionButtonProps {
   status: OrderStatus;

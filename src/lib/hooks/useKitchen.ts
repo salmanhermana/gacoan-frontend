@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { kitchenApi } from '@/lib/api/kitchen';
-import { QueueOrder, MenuAvailabilityRequest, OrderStatus } from '@/types';
+import { QueueOrder, OrderStatus } from '@/types/Order'; 
+import { MenuAvailabilityRequest } from '@/types/Menu';
 
 export const useQueue = () => {
   const [currentQueue, setCurrentQueue] = useState<QueueOrder | null>(null);

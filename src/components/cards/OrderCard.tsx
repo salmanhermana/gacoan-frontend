@@ -1,6 +1,6 @@
 'use client';
 
-import { QueueOrder, OrderStatus } from '@/types';
+import { QueueOrder, OrderStatus } from '@/types/Order';
 import OrderActionButton from '@/components/buttons/OrderActionButton';
 
 interface OrderCardProps {

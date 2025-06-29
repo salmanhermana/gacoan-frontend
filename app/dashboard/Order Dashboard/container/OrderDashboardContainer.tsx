@@ -2,7 +2,7 @@
 
 import { useQueue } from '@/lib/hooks/useKitchen';
 import OrderCard from '@/components/cards/OrderCard';
-import { OrderStatus } from '@/types';
+import { OrderStatus } from '@/types/Order';
 
 const OrderDashboardContainer: React.FC = () => {
   const { currentQueue, orderStatus, loading, error, startCooking, finishCooking } = useQueue();

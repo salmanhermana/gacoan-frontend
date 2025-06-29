@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "ES6"],
+    "lib": ["dom", "dom.iterable", "es6"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,32 +19,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      // Base alias
-      "@/*": ["./src/*"],
-      
-      // Domain Layer (Business Logic)
-      "@/domain/*": ["./src/domain/*"],
-      "@/entities/*": ["./src/domain/entities/*"],
-      "@/repositories/*": ["./src/domain/repositories/*"],
-      "@/usecases/*": ["./src/domain/use-cases/*"],
-      
-      // Infrastructure Layer (External Dependencies)  
-      "@/infrastructure/*": ["./src/infrastructure/*"],
-      "@/api/*": ["./src/infrastructure/api/*"],
-      "@/storage/*": ["./src/infrastructure/storage/*"],
-      
-      // Presentation Layer (UI)
-      "@/components/*": ["./src/presentation/components/*"],
-      "@/ui/*": ["./src/presentation/components/ui/*"],
-      "@/features/*": ["./src/presentation/components/features/*"],
-      "@/hooks/*": ["./src/presentation/hooks/*"],
-      "@/stores/*": ["./src/presentation/stores/*"],
-      
-      // Shared Layer (Common utilities)
-      "@/types/*": ["./src/shared/types/*"],
-      "@/utils/*": ["./src/shared/utils/*"],
-      "@/constants/*": ["./src/shared/constants/*"],
-      "@/config/*": ["./src/shared/config/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

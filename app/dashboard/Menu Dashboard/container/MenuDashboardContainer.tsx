@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import MenuCard from '@/components/cards/MenuCard';
-import { Menu } from '@/types';
+import { Menu } from '@/types/Menu';
 
 // replace with real API call
 const mockMenus: (Menu & { is_available: boolean })[] = [
