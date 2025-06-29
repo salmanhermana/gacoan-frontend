@@ -68,8 +68,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           ...prevItems,
           {
             id: menu.id,
-            name: menu.nama,
-            price: menu.harga,
+            name: menu.name,
+            price: Number(menu.price),
             quantity: 1,
             note: "",
             imageUrl: menu.image_url || "/images/BackgroundHero.png",

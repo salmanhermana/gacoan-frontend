@@ -123,3 +123,78 @@
     @apply bg-background text-foreground;
   }
 }
+
+.cart-controls-enter {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.cart-button-exit {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+.quantity-transition {
+  transition: all 0.3s ease;
+}
+
+.quantity-highlight {
+  background-color: rgb(255, 0, 0);
+  border-radius: 50%;
+  transition: background-color 0.5s ease;
+}
+
+/* Custom quantity controls styles */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+  background-color: white;
+  transition: all 0.3s ease;
+  width: 50%;
+}
+
+.quantity-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #243E80;
+  border: 1px solid rgba(36, 62, 128, 0.3);
+}
+
+.quantity-btn.increment,
+.quantity-btn.decrement {
+  background-color: #243E80;
+  color: white;
+  border: none;
+}
+
+.quantity-btn.increment:hover,
+.quantity-btn.decrement:hover {
+  background-color: #1a2d5e;
+}
+
+.quantity-value {
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* scrollbar category */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .quantity-control {
+    width: 100%;
+  }
+}

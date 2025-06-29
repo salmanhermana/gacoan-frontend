@@ -1,7 +1,12 @@
 export type Menu = {
   id: string;
-  nama: string;
-  harga: number;
-  stok: number;
+  name: string;
+  description: string;
   image_url: string | null;
+  is_available: boolean;
+  price: string;
+  category: {
+    id: string;
+    name: string;
+  };
 };

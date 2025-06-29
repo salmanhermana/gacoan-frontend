@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
-import { CartItem } from "@/types/checkout/order";
+import { CartItem } from "@/context/CartContext";
 
 type Props = {
   order: CartItem;

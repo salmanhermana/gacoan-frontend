@@ -1,4 +1,4 @@
-import { CartItem } from "@/types/checkout/order";
+import { CartItem } from "@/context/CartContext";
 import OrderItem from "./OrderItem";
 import Link from "next/link";
 

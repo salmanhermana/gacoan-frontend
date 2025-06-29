@@ -9,8 +9,13 @@ import Layout from "@/layouts/Layout";
 import OrderList from "@/app/(home)/checkout/components/OrderList";
 import TotalPayment from "@/app/(home)/checkout/components/TotalPayment";
 import { useCart } from "@/app/hooks/useCart";
+import withAuth from "@/components/hoc/withAuth";
+import { useCheckoutMutation } from "@/app/hooks/useCheckoutMutation";
+import { useOrderStatus } from "@/app/hooks/useGetOrderStatus";
 
-export default function CheckoutContainer() {
+export default withAuth(CheckoutContainer, "customer");
+
+function CheckoutContainer() {
   const methods = useForm({ mode: "onChange" });
   const {
     items,
@@ -27,7 +32,26 @@ export default function CheckoutContainer() {
   const [paymentStatus, setPaymentStatus] = useState<string>("pending");
   const [isEmpty, setIsEmpty] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
+  const { mutate: checkout, isPending: isCheckoutLoading } =
+    useCheckoutMutation();
+
+  const { data: orderData } = useOrderStatus(orderId);
+
+  useEffect(() => {
+    if (orderData?.data) {
+      setPaymentStatus(orderData.data.payment_status);
+
+      if (
+        ["success", "settlement", "capture"].includes(
+          orderData.data.payment_status,
+        )
+      ) {
+        clearCart();
+        router.push(`/orders/${orderId}`);
+      }
+    }
+  }, [orderData, clearCart, orderId, router]);
 
   useEffect(() => {
     if (items.length === 0 && !orderId) {
@@ -62,6 +86,25 @@ export default function CheckoutContainer() {
       .filter((note) => note && note.trim() !== "")
       .join(", ");
 
+    checkout(
+      {
+        items: formattedItems,
+        notes: combinedNotes || "",
+      },
+      {
+        onSuccess: (data) => {
+          if (data.status && data.data) {
+            const newOrderId = data.data.id.toString();
+            setOrderId(newOrderId);
+            setPaymentUrl(data.data.redirect_url);
+            setPaymentStatus(data.data.payment_status);
+
+            setIsRedirecting(true);
+            router.push(`/orders/${newOrderId}`);
+          }
+        },
+      },
+    );
   };
 
   const handleIncrement = (id: number | string) => {
