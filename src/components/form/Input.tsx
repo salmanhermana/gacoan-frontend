@@ -150,7 +150,7 @@ export default function Input({
               )}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <Eye /> : <EyeOff />}
+              {showPassword ? <EyeOff /> : <Eye />}
             </div>
           )}
         </div>
