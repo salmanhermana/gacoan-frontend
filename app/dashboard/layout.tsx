@@ -14,27 +14,6 @@ export default function DashboardLayout({
             <h1 className="text-xl font-bold text-gray-800">
               Kitchen Dashboard
             </h1>
-            
-            <div className="flex space-x-4">
-              <Link
-                href="/dashboard/menu"
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                Menu Dashboard
-              </Link>
-              <Link
-                href="/dashboard/order"
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                Order Dashboard
-              </Link>
-              <Link
-                href="/"
-                className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 rounded-md transition-colors"
-              >
-                Home
-              </Link>
-            </div>
           </div>
         </div>
       </nav>

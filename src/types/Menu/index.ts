@@ -1,19 +1,8 @@
-export interface Menu {
+export interface MenuItem {
   id: string;
   name: string;
-  is_available?: boolean;
-}
-
-export interface MenuAvailabilityRequest {
-  menu_id: string;
-  is_available: boolean;
-}
-
-export interface MenuAvailabilityResponse {
-  status: string;
-  message: string;
-  data: {
-    menu_id: string;
-    is_available: boolean;
-  };
+  image: string;
+  category: 'makanan' | 'minuman' | 'dessert';
+  isAvailable: boolean;
+  price?: number;
 }

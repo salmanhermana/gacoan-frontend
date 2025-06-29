@@ -1,102 +1,104 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { kitchenApi } from '@/lib/api/kitchen';
-import { QueueOrder, OrderStatus } from '@/types/Order'; 
-import { MenuAvailabilityRequest } from '@/types/Menu';
+import { MenuItem } from '@/types/Menu';
+import { Order } from '@/types/Order';
 
-export const useQueue = () => {
-  const [currentQueue, setCurrentQueue] = useState<QueueOrder | null>(null);
-  const [orderStatus, setOrderStatus] = useState<OrderStatus>(OrderStatus.PENDING);
+export const useKitchen = () => {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLowestQueue = useCallback(async () => {
+  // Fetch menu items
+  const fetchMenuItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await kitchenApi.getLowestQueueMenu();
-      setCurrentQueue(response.data);
-      setOrderStatus(OrderStatus.PENDING);
+      const items = await kitchenApi.getAllMenu();
+      setMenuItems(items);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch queue');
-      setCurrentQueue(null);
+      setError(err instanceof Error ? err.message : 'Failed to fetch menu items');
+      console.error('Error fetching menu items:', err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const startCooking = useCallback(async (queueCode: string) => {
+  // Fetch orders queue
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      await kitchenApi.startCooking({ queue_code: queueCode });
-      setOrderStatus(OrderStatus.COOKING);
+      
+      // For now, we'll simulate fetching multiple orders
+      // In production, you might have a different endpoint that returns multiple orders
+      const order = await kitchenApi.getLowestQueueMenu();
+      setOrders(order ? [order] : []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start cooking');
+      setError(err instanceof Error ? err.message : 'Failed to fetch orders');
+      console.error('Error fetching orders:', err);
+      // Don't throw error, just set empty orders to show mock data
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const finishCooking = useCallback(async (queueCode: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await kitchenApi.finishCooking({ queue_code: queueCode });
-      setOrderStatus(OrderStatus.READY);
-      // Clear queue sekarang sebelum lanjut
-      setTimeout(() => {
-        setCurrentQueue(null);
-        fetchLowestQueue(); // fetch next queue
-      }, 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to finish cooking');
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchLowestQueue]);
-
-  useEffect(() => {
-    fetchLowestQueue();
-    // Setup polling buat update real-time 
-    const interval = setInterval(fetchLowestQueue, 5000);
-    return () => clearInterval(interval);
-  }, [fetchLowestQueue]);
-
-  return {
-    currentQueue,
-    orderStatus,
-    loading,
-    error,
-    startCooking,
-    finishCooking,
-    refetch: fetchLowestQueue,
-  };
-};
-
-export const useMenuAvailability = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+  // Toggle menu availability
   const toggleMenuAvailability = useCallback(async (menuId: string, isAvailable: boolean) => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await kitchenApi.changeMenuAvailability({
-        menu_id: menuId,
-        is_available: isAvailable,
-      });
-      return response.data;
+      await kitchenApi.changeMenuAvailability(menuId, isAvailable);
+      setMenuItems(prev => 
+        prev.map(item => 
+          item.id === menuId ? { ...item, isAvailable } : item
+        )
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update menu availability');
       throw err;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
+  // Update order status
+  const updateOrderStatus = useCallback(async (queueCode: string, newStatus: 'cooking' | 'ready') => {
+    try {
+      if (newStatus === 'cooking') {
+        await kitchenApi.startCooking(queueCode);
+      } else if (newStatus === 'ready') {
+        await kitchenApi.finishCooking(queueCode);
+      }
+
+      setOrders(prev =>
+        prev.map(order =>
+          order.queue_code === queueCode ? { ...order, status: newStatus } : order
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update order status');
+      throw err;
+    }
+  }, []);
+
+  // Remove completed order
+  const removeOrder = useCallback((queueCode: string) => {
+    setOrders(prev => prev.filter(order => order.queue_code !== queueCode));
+  }, []);
+
+  // Clear error
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   return {
-    toggleMenuAvailability,
+    menuItems,
+    orders,
     loading,
     error,
+    fetchMenuItems,
+    fetchOrders,
+    toggleMenuAvailability,
+    updateOrderStatus,
+    removeOrder,
+    setError: clearError
   };
 };
