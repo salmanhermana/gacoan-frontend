@@ -26,6 +26,7 @@ export type OrderResponse = {
     transaction_id: number;
     total_price: string;
     payment_link: string;
+    token: string;
     orders: OrderItem[];
   };
   meta: null;

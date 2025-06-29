@@ -29,37 +29,30 @@ function CheckoutContainer() {
     totalPrice,
     clearCart,
   } = useCart();
-  const router = useRouter();
 
+  const router = useRouter();
   const { data: tableData = [] } = useGetAllTables();
+
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
 
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string>("pending");
   const [isEmpty, setIsEmpty] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const { mutate: checkout, isPending: isCheckoutLoading } = useCheckoutMutation();
-
+  const { mutateAsync: checkout, isPending: isCheckoutLoading } = useCheckoutMutation();
   const { data: orderData } = useOrderStatus(orderId);
-
 
   useEffect(() => {
     if (orderData?.data) {
-      setPaymentStatus(orderData.data.payment_status);
-
-      if (
-        ["success", "settlement", "capture"].includes(
-          orderData.data.payment_status,
-        )
-      ) {
-        clearCart();
-        router.push(`/orders/${orderId}`);
+      const status = orderData.data.payment_status
+      if (["success", "settlement", "capture"].includes(status)) {
+        clearCart()
+        router.push(`/orders/${orderId}`)
       }
     }
-  }, [orderData, clearCart, orderId, router]);
+  }, [orderData, clearCart, orderId, router])
 
   useEffect(() => {
     if (items.length === 0 && !orderId) {
@@ -83,35 +76,52 @@ function CheckoutContainer() {
     };
   }, [orderId, paymentUrl, isRedirecting]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!selectedTable) {
       toast.error("Silakan pilih nomor meja terlebih dahulu.")
       return;
     }
 
-    const formattedItems = items.map((item) => ({
-      menu_id: item.id.toString(),
-      quantity: item.quantity,
-    }));
+    try {
+      const payload = {
+        table_id: selectedTable.id,
+        orders: items.map((item) => ({
+          menu_id: item.id.toString(),
+          quantity: item.quantity,
+        })),
+      }
 
-    checkout(
-      {
-        table_id: selectedTable?.id,
-        orders: formattedItems
-      },
-      {
-        onSuccess: (data) => {
-          if (data.status && data.data) {
-            const newOrderId = data.data.transaction_id.toString();
-            setOrderId(newOrderId);
-            setPaymentUrl(data.data.payment_link);
+      const res = await checkout(payload)
 
-            setIsRedirecting(true);
-            router.push(`/orders/${newOrderId}`);
-          }
+      if (!res?.data?.token || !res?.data?.transaction_id) {
+        toast.error("Gagal memproses transaksi.")
+        return
+      }
+
+      const token = res.data.token
+      const trxId = res.data.transaction_id.toString()
+      setOrderId(trxId)
+      setIsRedirecting(true)
+
+      window.snap.pay(token, {
+        onSuccess: () => {
+          clearCart()
+          router.push(`/orders/${trxId}`)
         },
-      },
-    );
+        onPending: () => {
+          router.push(`/orders/${trxId}`)
+        },
+        onError: () => {
+          toast.error("Transaksi gagal. Coba lagi.")
+        },
+        onClose: () => {
+          toast("Transaksi dibatalkan.")
+        },
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error("Terjadi kesalahan saat checkout.")
+    }
   };
 
   const handleIncrement = (id: number | string) => {
