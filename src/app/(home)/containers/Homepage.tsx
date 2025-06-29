@@ -6,7 +6,7 @@ import MenuSection from "../components/MenuSection";
 import withAuth from "@/components/hoc/withAuth";
 import CartFooter from "@/layouts/CartFooter";
 
-export default withAuth(Home, "public");
+export default withAuth(Home, "auth");
 
 function Home() {
   return (

@@ -1,18 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 
-export function useOrderStatus(orderId: string | null) {
+export function useOrderStatus(transactionId: string | null) {
   return useQuery({
-    queryKey: ["order-status", orderId],
+    queryKey: ["order-status", transactionId],
     queryFn: async () => {
-      if (!orderId) return null;
-      const response = await api.get(`/order/${orderId}`);
+      if (!transactionId) return null;
+      const response = await api.get(`/transaction/${transactionId}`);
       return response.data;
     },
-    enabled: !!orderId,
-    refetchInterval: 10000,
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
-    retry: 3,
+    enabled: !!transactionId,
   });
 }

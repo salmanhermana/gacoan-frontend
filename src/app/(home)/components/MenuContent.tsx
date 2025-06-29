@@ -5,6 +5,7 @@ import IconButton from "@/components/buttons/IconButton";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/buttons/Button";
 import { Menu } from "@/types/menu/menu";
+import { formatIDR } from "@/app/utils/currencyUtils";
 
 const MenuContent = ({ item }: { item: Menu }) => {
   const { addToCart, items, updateQuantity } = useCart();
@@ -50,7 +51,7 @@ const MenuContent = ({ item }: { item: Menu }) => {
           <p className="text-sm font-regular h-full">{item.description}</p>
         </div>
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-3">
-          <p className="text-red-main text-lg font-bold">Rp{item.price}</p>
+          <p className="text-red-main text-lg font-bold">{formatIDR(item.price)}</p>
 
           {isInCart ? (
             <div

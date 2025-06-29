@@ -30,3 +30,17 @@ export type OrderResponse = {
   };
   meta: null;
 };
+
+export type TransactionData = {
+  id: string;
+  queue_code: string;
+  estimate_time: string;
+  orders: MenuItem[];
+  total_price: string;
+  table: {
+    id: string;
+    table_number: string;
+  };
+  order_status: "pending" | "cooking" | "served" | "cancelled" | string;
+  is_delayed: boolean;
+};

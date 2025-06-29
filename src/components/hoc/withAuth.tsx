@@ -24,6 +24,7 @@ const LOGIN_ROUTE = "/login";
 
 export enum RouteRole {
   public,
+  auth,
   customer,
   kitchen,
   waiter,
@@ -35,6 +36,7 @@ const hasAccess = (
   userRole: Role,
   routeRole: keyof typeof RouteRole,
 ): boolean => {
+  if (routeRole === "auth") return true;
   switch (userRole) {
     case "customer":
       return routeRole === "customer" || routeRole === "public";

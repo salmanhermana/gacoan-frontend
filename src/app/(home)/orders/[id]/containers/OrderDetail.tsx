@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
-  AlertCircle,
-  CheckCircle,
-  ExternalLink,
   Loader2,
   RotateCw,
   XCircle,
@@ -15,41 +11,23 @@ import Link from "next/link";
 import ButtonLink from "@/components/links/ButtonLink";
 import { useQueryClient } from "@tanstack/react-query";
 import { useOrderStatus } from "@/app/hooks/useGetOrderStatus";
-import { useCart } from "@/context/CartContext";
-
-type MenuItem = {
-  menu_name: string;
-  quantity: number;
-};
+import { OrderItem } from "@/types/checkout/order";
+import formatDuration from "@/app/utils/durationUtils";
+import { formatIDR } from "@/app/utils/currencyUtils";
 
 export default function OrderDetailsContainer() {
   const params = useParams();
   const orderId = params.id as string;
-  const { clearCart } = useCart();
+  const queryClient = useQueryClient();
 
   const {
     data: orderData,
     isLoading,
-    isPending,
     isError,
   } = useOrderStatus(orderId);
 
-  const queryClient = useQueryClient();
-  const orderDetails = orderData?.data?.order;
-  const paymentStatus = orderDetails?.payment_status || "pending";
-  const orderStatus = orderDetails?.order_status || "pending";
-  const orderItems = orderDetails?.items || [];
-
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-
-  // @ts-ignore
-  const handleRedirectToPayment = (e) => {
-    e.stopPropagation();
-
-    if (paymentUrl) {
-      window.open(paymentUrl, "_blank");
-    }
-  };
+  const orderDetails = orderData?.data?.orders;
+  const orderStatus = orderData?.data?.order_status;
 
   // @ts-ignore
   const handleRefetch = (e) => {
@@ -94,6 +72,8 @@ export default function OrderDetailsContainer() {
           <div className="mb-8">
             <h1 className="text-2xl font-bold mb-2">Detail Pesanan</h1>
             <p className="text-gray-600">Order ID: #{orderId}</p>
+            <p className="text-gray-600">Nomor Meja: {orderData.data.table.table_number}</p>
+            <p className="text-gray-600">Nomor Antrian: {orderData.data.queue_code}</p>
           </div>
           <RotateCw
             onClick={handleRefetch}
@@ -102,100 +82,27 @@ export default function OrderDetailsContainer() {
         </div>
 
         <div className="bg-white p-6 rounded-xl border mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            {paymentStatus === "pending" ? (
-              <AlertCircle size={24} className="text-yellow-500" />
-            ) : ["success", "settlement", "capture"].includes(paymentStatus) ? (
-              <CheckCircle size={24} className="text-green-500" />
-            ) : ["expire", "cancel", "deny", "failure"].includes(
-              paymentStatus,
-            ) ? (
-              <XCircle size={24} className="text-red-500" />
-            ) : (
-              <Loader2 size={24} className="text-blue-500 animate-spin" />
-            )}
-            <h2 className="text-xl font-semibold">
-              Status Pembayaran:{" "}
-              {paymentStatus &&
-                paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1)}
-            </h2>
-          </div>
-
-          {paymentStatus === "pending" && (
-            <>
-              <p className="mb-6">
-                Silakan selesaikan pembayaran untuk memproses pesanan Anda.
-              </p>
-              <button
-                onClick={handleRedirectToPayment}
-                className="flex items-center justify-center gap-2 bg-[#243E80] text-white px-6 py-3 rounded-lg hover:bg-[#1e3367] w-full"
-              >
-                <span>Lanjutkan ke Halaman Pembayaran</span>
-                <ExternalLink size={18} />
-              </button>
-            </>
-          )}
-
-          {["success", "settlement", "capture"].includes(paymentStatus) && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-800">
-              <p className="font-medium mb-2">
-                Terima kasih! Pembayaran Anda telah berhasil diproses.
-              </p>
-              <p>
-                Status pesanan:{" "}
-                <span className="font-semibold capitalize">{orderStatus}</span>
-              </p>
-              {orderDetails.estimasi && (
-                <p className="mt-2">
-                  Estimasi waktu selesai: {orderDetails.estimasi}
-                </p>
-              )}
-              {orderDetails.antrian !== null && (
-                <p className="mt-2">Nomor antrian: {orderDetails.antrian}</p>
-              )}
-            </div>
-          )}
-
-          {["expire", "cancel", "deny", "failure"].includes(paymentStatus) && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
-              <p className="font-medium">
-                Terjadi masalah dengan pembayaran Anda.
-              </p>
-              <p className="mt-2">Silakan coba lagi atau hubungi dukungan.</p>
-              <Link
-                href="/"
-                className="mt-4 inline-block bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300"
-              >
-                Kembali ke Beranda
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border mb-6">
           <h2 className="text-lg font-semibold mb-4">Informasi Pesanan</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-600">Waktu Pemesanan</span>
-              <span className="font-medium">
-                {new Date(orderDetails.created_at).toLocaleString("id-ID", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </span>
+              <span className="text-gray-600">Estimasi Waktu Pemesanan</span>
+              <span className="font-medium">{formatDuration(orderData.data.estimate_time)}</span>
             </div>
 
             <div className="py-2 border-b border-gray-100">
               <span className="text-gray-600 block mb-2">Item Pesanan</span>
-              <div className="pl-6">
-                {orderItems.length > 0 ? (
-                  orderItems.map((item: MenuItem, index: number) => (
+              <div className="">
+                {orderDetails.length > 0 ? (
+                  orderDetails.map((item: OrderItem, index: number) => (
                     <div
                       key={index}
                       className="flex justify-between items-center py-1"
                     >
-                      <span className="font-medium">{item.menu_name}</span>
-                      <span className="text-gray-800">x{item.quantity}</span>
+                      <div className="flex gap-2">
+                        <span className="font-medium text-gray-800">x{item.quantity}</span>
+                        <span className="font-medium">{item.menu.name}</span>
+                      </div>
+                      <span className="font-semibold text-md">{formatIDR(item.menu.price)}</span>
                     </div>
                   ))
                 ) : (
@@ -205,12 +112,18 @@ export default function OrderDetailsContainer() {
             </div>
 
             <div className="flex justify-between py-2 border-b border-gray-100">
+              <span className="text-gray-600">Total Harga</span>
+              <span className="font-medium capitalize">{formatIDR(orderData.data.total_price)}</span>
+            </div>
+
+            <div className="flex justify-between py-2 border-b border-gray-100">
               <span className="text-gray-600">Status Pesanan</span>
               <span className="font-medium capitalize">{orderStatus}</span>
             </div>
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">Status Pembayaran</span>
-              <span className="font-medium capitalize">{paymentStatus}</span>
+
+            <div className="flex justify-between py-2 border-b border-gray-100">
+              <span className="text-gray-600">Pesanan Terlambat</span>
+              <span className="font-medium capitalize">{orderData.data.is_delayed ? "Ya" : "Tidak"}</span>
             </div>
           </div>
         </div>
