@@ -6,7 +6,7 @@ interface Props {
 
 export default function MenuTabs({ tabs, activeTab, onChange }: Props) {
     return (
-        <div className="fixed w-full overflow-x-auto whitespace-nowrap scrollbar-hide border-b border-gray-300 bg-white pt-24 top-0">
+        <div className="sticky w-full overflow-x-auto whitespace-nowrap scrollbar-hide border-b border-gray-300 bg-white pt-24 top-0">
             <div className="flex px-4 gap-2 w-full justify-between">
                 {tabs.map((tab) => (
                     <button

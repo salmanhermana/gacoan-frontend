@@ -3,7 +3,6 @@ import { GetServerSidePropsContext } from "next/types";
 import Cookies from "universal-cookie";
 
 import { getToken } from "@/lib/cookies";
-import { UninterceptedApiError } from "@/types/api";
 
 const context = <GetServerSidePropsContext>{};
 
@@ -44,27 +43,19 @@ api.interceptors.request.use(function (config) {
 });
 
 api.interceptors.response.use(
-  (config) => {
-    return config;
-  },
-  (error: AxiosError<UninterceptedApiError>) => {
-    // parse error
-    if (error.response?.data.message) {
-      return Promise.reject({
-        ...error,
-        response: {
-          ...error.response,
-          data: {
-            ...error.response.data,
-            message:
-              typeof error.response.data.message === "string"
-                ? error.response.data.message
-                : Object.values(error.response.data.message)[0][0],
-          },
-        },
-      });
-    }
+  (response) => response,
+
+  (error: AxiosError) => {
+      const data: any = error.response?.data ?? {};
+
+      const backendMessage =
+      data.error ||
+      data.message ||
+      error.message; 
+
+      error.message = backendMessage;
+
     return Promise.reject(error);
-  },
+  }
 );
 export default api;

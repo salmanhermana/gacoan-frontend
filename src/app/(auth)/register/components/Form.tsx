@@ -5,6 +5,7 @@ import Button from "@/components/buttons/Button";
 import Input from "@/components/form/Input";
 import * as React from "react";
 import useCreateUserMutation, { CreateUserRequest } from "@/app/hooks/useCreateUserMutation";
+import { validationRules } from "@/app/utils/validation";
 
 const Form = () => {
   const methods = useForm<CreateUserRequest>();
@@ -20,24 +21,6 @@ const Form = () => {
     <FormProvider {...methods}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <Input
-          id="email"
-          label="Email"
-          type="email"
-          placeholder="Masukkan email"
-          className="w-full"
-          validation={{ required: "Email wajib diisi" }}
-        />
-
-        <Input
-          id="password"
-          type="password"
-          label="Password"
-          placeholder="Masukkan kata sandi"
-          className="w-full"
-          validation={{ required: "Kata sandi wajib diisi" }}
-        />
-
-        <Input
           id="name"
           label="Nama"
           type="text"
@@ -51,7 +34,25 @@ const Form = () => {
           label="Nomor Telepon"
           placeholder="Masukkan nomor telepon"
           className="w-full"
-          validation={{ required: "Nomor wajib diisi" }}
+          validation={validationRules.phone}
+        />
+
+        <Input
+          id="email"
+          label="Email"
+          type="email"
+          placeholder="Masukkan email"
+          className="w-full"
+          validation={validationRules.email}
+        />
+
+        <Input
+          id="password"
+          type="password"
+          label="Password"
+          placeholder="Masukkan kata sandi"
+          className="w-full"
+          validation={validationRules.password}
         />
 
         <Button

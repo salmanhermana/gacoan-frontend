@@ -26,7 +26,7 @@ const MenuSection = () => {
     <div className="bg-gray-100 min-h-screen">
       <MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 lg:p-12 pt-40">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 lg:p-12">
         {isLoading
           ? Array.from({ length: 8 }).map((_, i) => <MenuContentSkeleton key={i} />)
           : menuData.map((item) => (
