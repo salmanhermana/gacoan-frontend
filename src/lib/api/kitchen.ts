@@ -4,7 +4,7 @@ import { Order } from '@/types/Order';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://178.128.123.116';
 
 export const kitchenApi = {
-  // Get all menu items (existing endpoint)
+  // existing endpoint
   async getAllMenu(): Promise<MenuItem[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/menu`);
@@ -17,13 +17,13 @@ export const kitchenApi = {
     }
   },
 
-  // Get lowest queue menu (API contract endpoint)
+  // API contract endpoint
   async getLowestQueueMenu(): Promise<Order | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/kitchen/queue/lowest`);
       if (!response.ok) {
         if (response.status === 404) {
-          // No orders in queue
+          // tidak ada orders dalam queue
           return null;
         }
         throw new Error('Failed to fetch queue');
@@ -41,7 +41,7 @@ export const kitchenApi = {
     }
   },
 
-  // Start cooking (API contract endpoint)
+  // API contract endpoint
   async startCooking(queueCode: string): Promise<Order> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/kitchen/start-cooking`, {
@@ -65,7 +65,7 @@ export const kitchenApi = {
     }
   },
 
-  // Finish cooking (API contract endpoint)
+  // API contract endpoint
   async finishCooking(queueCode: string): Promise<void> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/kitchen/finish-cooking`, {
@@ -82,7 +82,7 @@ export const kitchenApi = {
     }
   },
 
-  // Change menu availability (API contract endpoint)
+  // API contract endpoint
   async changeMenuAvailability(menuId: string, isAvailable: boolean): Promise<{ menu_id: string; is_available: boolean }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/kitchen/menu-availability`, {
@@ -104,7 +104,7 @@ export const kitchenApi = {
     }
   },
 
-  // Update menu availability (existing endpoint - keep for backward compatibility)
+  // endpoint
   async updateMenuAvailability(menuId: string): Promise<MenuItem> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/menu/${menuId}/availability`, {

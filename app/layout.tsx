@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Kitchen Dashboard - Restaurant Management System',
-  description: 'Real-time kitchen management system for restaurants',
+  title: 'Gacoan Kitchen Dashboard',
+  description: 'Gacoan Kitchen Dashboard',
 }
 
 export default function RootLayout({

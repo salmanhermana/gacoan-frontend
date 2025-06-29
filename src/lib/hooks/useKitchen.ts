@@ -30,21 +30,19 @@ export const useKitchen = () => {
       setLoading(true);
       setError(null);
       
-      // For now, we'll simulate fetching multiple orders
-      // In production, you might have a different endpoint that returns multiple orders
+      // simulasi fetch order
       const order = await kitchenApi.getLowestQueueMenu();
       setOrders(order ? [order] : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch orders');
       console.error('Error fetching orders:', err);
-      // Don't throw error, just set empty orders to show mock data
+      // jangan throw error, buat nunjukin mock data
       setOrders([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Toggle menu availability
   const toggleMenuAvailability = useCallback(async (menuId: string, isAvailable: boolean) => {
     try {
       await kitchenApi.changeMenuAvailability(menuId, isAvailable);
@@ -59,7 +57,6 @@ export const useKitchen = () => {
     }
   }, []);
 
-  // Update order status
   const updateOrderStatus = useCallback(async (queueCode: string, newStatus: 'cooking' | 'ready') => {
     try {
       if (newStatus === 'cooking') {
@@ -79,12 +76,10 @@ export const useKitchen = () => {
     }
   }, []);
 
-  // Remove completed order
   const removeOrder = useCallback((queueCode: string) => {
     setOrders(prev => prev.filter(order => order.queue_code !== queueCode));
   }, []);
 
-  // Clear error
   const clearError = useCallback(() => {
     setError(null);
   }, []);
