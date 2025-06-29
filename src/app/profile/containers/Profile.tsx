@@ -58,7 +58,7 @@ function ProfileContainer() {
                 logout();
                 router.push("/login");
               }}
-              variant="outline"
+              variant="red"
               className="flex items-center gap-2 cursor-pointer"
             >
               <LogOut size={16} />

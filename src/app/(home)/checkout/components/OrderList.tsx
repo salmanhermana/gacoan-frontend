@@ -8,7 +8,6 @@ type Props = {
   onIncrement: (id: number | string) => void;
   onDecrement: (id: number | string) => void;
   onDelete: (id: number | string) => void;
-  onNoteChange: (id: number | string, note: string) => void;
 };
 
 export default function OrderList({
@@ -17,7 +16,6 @@ export default function OrderList({
   onIncrement,
   onDecrement,
   onDelete,
-  onNoteChange,
 }: Props) {
   return (
     <div className="flex flex-col gap-4 rounded-xl border bg-white p-4">
@@ -41,7 +39,6 @@ export default function OrderList({
             onIncrement={onIncrement}
             onDecrement={onDecrement}
             onDelete={onDelete}
-            onNoteChange={onNoteChange}
           />
           {index !== orders.length - 1 && <hr className="border" />}
         </div>

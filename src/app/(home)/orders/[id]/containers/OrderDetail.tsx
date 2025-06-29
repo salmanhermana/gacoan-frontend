@@ -13,9 +13,9 @@ import {
 import Layout from "@/layouts/Layout";
 import Link from "next/link";
 import ButtonLink from "@/components/links/ButtonLink";
-import { useCart } from "@/app/hooks/useCart";
 import { useQueryClient } from "@tanstack/react-query";
 import { useOrderStatus } from "@/app/hooks/useGetOrderStatus";
+import { useCart } from "@/context/CartContext";
 
 type MenuItem = {
   menu_name: string;
@@ -204,14 +204,6 @@ export default function OrderDetailsContainer() {
               </div>
             </div>
 
-            {orderDetails.notes && (
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-600">Catatan</span>
-                <span className="font-medium text-right">
-                  {orderDetails.notes}
-                </span>
-              </div>
-            )}
             <div className="flex justify-between py-2 border-b border-gray-100">
               <span className="text-gray-600">Status Pesanan</span>
               <span className="font-medium capitalize">{orderStatus}</span>

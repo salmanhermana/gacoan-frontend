@@ -19,7 +19,6 @@ type Order = {
   user_id: string;
   order_status: string;
   payment_status: string;
-  notes: string | null;
   estimasi: string | null;
   antrian: number | null;
   payment_status_updated_at: string;
@@ -37,7 +36,6 @@ export default function OrderHistoryContainer() {
   const [error, setError] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string>("pending");
   const [orderStatus, setOrderStatus] = useState<string>("");
-
 
   const handleViewOrder = (orderId: number) => {
     router.push(`/orders/${orderId}`);

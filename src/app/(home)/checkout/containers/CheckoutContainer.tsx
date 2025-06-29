@@ -8,10 +8,15 @@ import ButtonLink from "@/components/links/ButtonLink";
 import Layout from "@/layouts/Layout";
 import OrderList from "@/app/(home)/checkout/components/OrderList";
 import TotalPayment from "@/app/(home)/checkout/components/TotalPayment";
-import { useCart } from "@/app/hooks/useCart";
 import withAuth from "@/components/hoc/withAuth";
 import { useCheckoutMutation } from "@/app/hooks/useCheckoutMutation";
 import { useOrderStatus } from "@/app/hooks/useGetOrderStatus";
+import { useCart } from "@/context/CartContext";
+import TableNumber from "../components/TableNumber";
+import { Table } from "@/types/table/table";
+import useGetAllTables from "@/app/hooks/useGetAllTables";
+import toast from "react-hot-toast";
+import ChooseTableNumberModal from "../modal/ChooseTableNumberModal";
 
 export default withAuth(CheckoutContainer, "customer");
 
@@ -21,11 +26,14 @@ function CheckoutContainer() {
     items,
     updateQuantity,
     removeFromCart,
-    updateNote,
     totalPrice,
     clearCart,
   } = useCart();
   const router = useRouter();
+
+  const { data: tableData = [] } = useGetAllTables();
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
 
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
@@ -33,10 +41,10 @@ function CheckoutContainer() {
   const [isEmpty, setIsEmpty] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const { mutate: checkout, isPending: isCheckoutLoading } =
-    useCheckoutMutation();
+  const { mutate: checkout, isPending: isCheckoutLoading } = useCheckoutMutation();
 
   const { data: orderData } = useOrderStatus(orderId);
+
 
   useEffect(() => {
     if (orderData?.data) {
@@ -76,28 +84,27 @@ function CheckoutContainer() {
   }, [orderId, paymentUrl, isRedirecting]);
 
   const handleCheckout = () => {
+    if (!selectedTable) {
+      toast.error("Silakan pilih nomor meja terlebih dahulu.")
+      return;
+    }
+
     const formattedItems = items.map((item) => ({
       menu_id: item.id.toString(),
       quantity: item.quantity,
     }));
 
-    const combinedNotes = items
-      .map((item) => item.note)
-      .filter((note) => note && note.trim() !== "")
-      .join(", ");
-
     checkout(
       {
-        items: formattedItems,
-        notes: combinedNotes || "",
+        table_id: selectedTable?.id,
+        orders: formattedItems
       },
       {
         onSuccess: (data) => {
           if (data.status && data.data) {
-            const newOrderId = data.data.id.toString();
+            const newOrderId = data.data.transaction_id.toString();
             setOrderId(newOrderId);
-            setPaymentUrl(data.data.redirect_url);
-            setPaymentStatus(data.data.payment_status);
+            setPaymentUrl(data.data.payment_link);
 
             setIsRedirecting(true);
             router.push(`/orders/${newOrderId}`);
@@ -119,9 +126,6 @@ function CheckoutContainer() {
     removeFromCart(id);
   };
 
-  const handleNoteChange = (id: number | string, note: string) => {
-    updateNote(id, note);
-  };
 
   if (isEmpty) {
     return (
@@ -142,6 +146,12 @@ function CheckoutContainer() {
           {/* Order Details - Only show if no order has been created yet */}
           {!orderId && (
             <>
+              {/* Pilih nomor meja */}
+              <TableNumber
+                selectedTable={selectedTable}
+                onOpenModal={() => setIsTableModalOpen(true)}
+              />
+
               {/* Pesanan */}
               <OrderList
                 orders={items}
@@ -149,7 +159,6 @@ function CheckoutContainer() {
                 onIncrement={handleIncrement}
                 onDecrement={handleDecrement}
                 onDelete={handleDelete}
-                onNoteChange={handleNoteChange}
               />
 
               <TotalPayment total={totalPrice} />
@@ -170,7 +179,7 @@ function CheckoutContainer() {
               <button
                 disabled={isCheckoutLoading}
                 onClick={handleCheckout}
-                className={`px-6 py-2 rounded-md text-white font-medium transition-all duration-200 ${isCheckoutLoading
+                className={`px-6 py-2 rounded-md text-white font-medium transition-all duration-200 cursor-pointer ${isCheckoutLoading
                   ? "bg-gray-400"
                   : "bg-[#243E80] hover:bg-[#1e3367]"
                   }`}
@@ -188,6 +197,17 @@ function CheckoutContainer() {
           </div>
         )}
       </div>
+
+      {isTableModalOpen && tableData && (
+        <ChooseTableNumberModal
+          tables={tableData}
+          onClose={() => setIsTableModalOpen(false)}
+          onSelect={(table) => {
+            setSelectedTable(table);
+            setIsTableModalOpen(false);
+          }}
+        />
+      )}
     </Layout>
   );
 }

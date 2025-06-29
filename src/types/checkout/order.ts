@@ -3,28 +3,30 @@ export type CheckoutItem = {
   quantity: number;
 };
 
+export type MenuItem = {
+  id: string;
+  name: string;
+  price: string;
+};
+
+export type OrderItem = {
+  menu: MenuItem;
+  quantity: number;
+};
+
 export type CheckoutRequest = {
-  items: CheckoutItem[];
-  notes: string;
+  table_id: string;
+  orders: CheckoutItem[];
 };
 
 export type OrderResponse = {
   status: boolean;
   message: string;
   data: {
-    id: number;
-    user_id: string;
-    tenant_id: string;
-    order_status: string;
-    payment_status: string;
-    notes: string;
-    estimasi: null | string;
-    antrian: null | number;
-    payment_status_updated_at: string;
-    order_status_updated_at: string;
-    created_at: string;
-    token: string;
-    redirect_url: string;
+    transaction_id: number;
+    total_price: string;
+    payment_link: string;
+    orders: OrderItem[];
   };
   meta: null;
 };

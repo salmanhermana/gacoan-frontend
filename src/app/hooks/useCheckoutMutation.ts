@@ -9,7 +9,7 @@ export function useCheckoutMutation() {
 
   return useMutation({
     mutationFn: async (data: CheckoutRequest) => {
-      const response = await api.post("/order/checkout", data);
+      const response = await api.post("/transaction/", data);
       return response.data as OrderResponse;
     },
     onSuccess: () => {

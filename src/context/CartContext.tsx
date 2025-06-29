@@ -8,7 +8,6 @@ export type CartItem = {
   name: string;
   price: number;
   quantity: number;
-  note: string;
   imageUrl: string;
 };
 
@@ -22,7 +21,6 @@ type CartContextType = {
     itemId: number | string,
     type: "increment" | "decrement",
   ) => void;
-  updateNote: (itemId: number | string, note: string) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -71,7 +69,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             name: menu.name,
             price: Number(menu.price),
             quantity: 1,
-            note: "",
             imageUrl: menu.image_url || "/images/BackgroundHero.png",
           },
         ];
@@ -109,12 +106,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const updateNote = (itemId: number | string, note: string) => {
-    setItems((prevItems) =>
-      prevItems.map((item) => (item.id === itemId ? { ...item, note } : item)),
-    );
-  };
-
   const clearCart = () => {
     setItems([]);
     localStorage.removeItem("cart");
@@ -134,7 +125,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
-        updateNote,
         clearCart,
         totalItems,
         totalPrice,
