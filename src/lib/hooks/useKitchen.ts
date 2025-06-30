@@ -6,9 +6,9 @@ import { QueueData } from '@/types/Order';
 export const useKitchen = () => {
   const [menuItems, setMenuItems] = useState<Menu[]>([]);
   const [orders, setOrders] = useState<{
-    data: QueueData | null;
-    status: 'pending' | 'cooking' | 'ready';
-    timestamp: string;
+  data: QueueData;
+  status: 'pending' | 'cooking' | 'ready';
+  timestamp: string;
   }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +34,12 @@ export const useKitchen = () => {
       const response = await kitchenApi.getLowestQueueMenu();
       if (response) {
         setOrders([
-          {
-            data: response,
-            status: 'pending',
-            timestamp: new Date().toLocaleTimeString()
-          }
-        ]);
+        {
+          data: response.data,
+          status: response.status,
+          timestamp: response.timestamp
+        }
+      ]);
       } else {
         setOrders([]);
       }

@@ -13,6 +13,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const isMenuActive = pathname === '/dashboard/menu';
   const isOrderActive = pathname === '/dashboard/order';
+  const isWaiterActive = pathname === '/dashboard/waiter';
+
 
   return (
     <div className="min-h-screen bg-white-200 font-inter">
@@ -32,6 +34,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           }`}
         >
           Antrian Order
+        </button>
+        <button
+          onClick={() => router.push('/dashboard/waiter')}
+          className={`w-[415.3px] h-full flex items-center justify-center font-semibold border-b-4 ${
+            isOrderActive ? 'text-tomato bg-white border-tomato' : 'text-black bg-white border-transparent'
+          }`}
+        >
+          Waiter
         </button>
       </div>
       <div className="max-w-7xl mx-auto p-6">{children}</div>
