@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useKitchen } from '@/lib/hooks/useKitchen';
 import MenuCard from '@/components/cards/MenuCard';
-import { MenuItem } from '@/types/Menu';
+import { Menu } from '@/types/Menu/menu';
 
 const MenuContainer: React.FC = () => {
   const {
@@ -16,46 +16,11 @@ const MenuContainer: React.FC = () => {
   } = useKitchen();
   const [activeCategory, setActiveCategory] = useState<'makanan' | 'minuman' | 'dessert'>('makanan');
 
-  const mockMenuItems: MenuItem[] = [
-  {
-    id: '1',
-    name: 'MIE GACOAN LV 1',
-    image: '/api/placeholder/300/200',
-    category: 'makanan',
-    isAvailable: true
-  },
-  {
-    id: '2',
-    name: 'MIE GACOAN LV 2',
-    image: '/api/placeholder/300/200',
-    category: 'makanan',
-    isAvailable: false
-  },
-  {
-    id: '3',
-    name: 'ES TEH MANIS',
-    image: '/api/placeholder/300/200',
-    category: 'minuman',
-    isAvailable: true
-  },
-  {
-    id: '4',
-    name: 'PUDING COKLAT',
-    image: '/api/placeholder/300/200',
-    category: 'dessert',
-    isAvailable: true
-  }
-];
-
-
   useEffect(() => {
     fetchMenuItems();
   }, [fetchMenuItems]);
 
-  const filteredItems =
-  menuItems.length > 0
-    ? menuItems.filter(item => item.category === activeCategory)
-    : mockMenuItems.filter(item => item.category === activeCategory);
+  const filteredItems: Menu[] = menuItems.filter(item => item.category.name.toLowerCase() === activeCategory);
 
   return (
     <div className="flex flex-col gap-6">

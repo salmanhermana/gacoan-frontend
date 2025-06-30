@@ -30,18 +30,22 @@ const OrderContainer: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {orders.map((order, index) => {
-          const orderNumber = parseInt(order.queue_code.replace(/\D/g, '')) || index + 1;
-          return (
-            <OrderCard
-              key={order.queue_code}
-              order={order}
-              orderNumber={orderNumber}
-              onUpdateStatus={updateOrderStatus}
-              onRemoveOrder={removeOrder}
-            />
-          );
-        })}
+        {orders.map((item, index) => {
+        if (!item.data) return null;
+
+        const orderNumber = parseInt(item.data.queue_code.replace(/\D/g, '')) || index + 1;
+        return (
+          <OrderCard
+            key={item.data.queue_code}
+            order={item.data}
+            orderNumber={orderNumber}
+            status={item.status}
+            timestamp={item.timestamp}
+            onUpdateStatus={updateOrderStatus}
+            onRemoveOrder={removeOrder}
+          />
+        );
+      })}
       </div>
 
       {!loading && orders.length === 0 && (

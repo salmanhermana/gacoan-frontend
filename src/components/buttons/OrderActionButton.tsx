@@ -1,9 +1,7 @@
 'use client';
 
-import { OrderStatus } from '@/types/Order';
-
 interface OrderActionButtonProps {
-  status: OrderStatus;
+  status: 'pending' | 'cooking' | 'ready';
   onStartCooking: () => void;
   onFinishCooking: () => void;
   loading: boolean;
@@ -17,19 +15,19 @@ const OrderActionButton: React.FC<OrderActionButtonProps> = ({
 }) => {
   const getButtonConfig = () => {
     switch (status) {
-      case OrderStatus.PENDING:
+      case 'pending':
         return {
           text: 'Kerjakan Order',
           onClick: onStartCooking,
           className: 'bg-orange-500 hover:bg-orange-600 text-white',
         };
-      case OrderStatus.COOKING:
+      case 'cooking':
         return {
           text: 'Selesaikan Order',
           onClick: onFinishCooking,
           className: 'bg-green-500 hover:bg-green-600 text-white',
         };
-      case OrderStatus.READY:
+      case 'ready':
         return {
           text: 'Order Selesai!',
           onClick: () => {},
@@ -43,7 +41,7 @@ const OrderActionButton: React.FC<OrderActionButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      disabled={loading || status === OrderStatus.READY}
+      disabled={loading || status === 'ready'}
       className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${className} ${
         loading ? 'opacity-50 cursor-not-allowed' : ''
       }`}

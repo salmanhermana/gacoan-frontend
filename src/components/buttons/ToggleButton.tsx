@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMenuAvailability } from '/lib/hooks/useKitchen';
+import { useKitchen  } from '@/lib/hooks/useKitchen';
 
 interface ToggleButtonProps {
   menuId: string;
@@ -15,7 +15,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
   onToggle,
 }) => {
   const [isAvailable, setIsAvailable] = useState(initialAvailable);
-  const { toggleMenuAvailability, loading } = useMenuAvailability();
+  const { toggleMenuAvailability, loading } = useKitchen(); // perbaikan path + hook
 
   const handleToggle = async () => {
     try {
@@ -24,7 +24,6 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
       setIsAvailable(newAvailability);
       onToggle?.(newAvailability);
     } catch (error) {
-      // Error di handle hook
       console.error('Toggle failed:', error);
     }
   };

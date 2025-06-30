@@ -1,20 +1,23 @@
 import { useState, useCallback } from 'react';
 import { kitchenApi } from '@/lib/api/kitchen';
-import { MenuItem } from '@/types/Menu';
-import { Order } from '@/types/Order';
+import { Menu } from '@/types/Menu/menu';
+import { QueueData } from '@/types/Order';
 
 export const useKitchen = () => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [menuItems, setMenuItems] = useState<Menu[]>([]);
+  const [orders, setOrders] = useState<{
+    data: QueueData | null;
+    status: 'pending' | 'cooking' | 'ready';
+    timestamp: string;
+  }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch menu items
   const fetchMenuItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const items = await kitchenApi.getAllMenu();
+      const items: Menu[] = await kitchenApi.getAllMenu();
       setMenuItems(items);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch menu items');
@@ -24,19 +27,25 @@ export const useKitchen = () => {
     }
   }, []);
 
-  // Fetch orders queue
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // simulasi fetch order
-      const order = await kitchenApi.getLowestQueueMenu();
-      setOrders(order ? [order] : []);
+      const response = await kitchenApi.getLowestQueueMenu();
+      if (response) {
+        setOrders([
+          {
+            data: response,
+            status: 'pending',
+            timestamp: new Date().toLocaleTimeString()
+          }
+        ]);
+      } else {
+        setOrders([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch orders');
       console.error('Error fetching orders:', err);
-      // jangan throw error, buat nunjukin mock data
       setOrders([]);
     } finally {
       setLoading(false);
@@ -45,10 +54,10 @@ export const useKitchen = () => {
 
   const toggleMenuAvailability = useCallback(async (menuId: string, isAvailable: boolean) => {
     try {
-      await kitchenApi.changeMenuAvailability(menuId, isAvailable);
-      setMenuItems(prev => 
-        prev.map(item => 
-          item.id === menuId ? { ...item, isAvailable } : item
+      const response = await kitchenApi.changeMenuAvailability(menuId, isAvailable);
+      setMenuItems(prev =>
+        prev.map(item =>
+          item.id === response.menu_id ? { ...item, is_available: response.is_available } : item
         )
       );
     } catch (err) {
@@ -67,7 +76,7 @@ export const useKitchen = () => {
 
       setOrders(prev =>
         prev.map(order =>
-          order.queue_code === queueCode ? { ...order, status: newStatus } : order
+          order.data?.queue_code === queueCode ? { ...order, status: newStatus } : order
         )
       );
     } catch (err) {
@@ -77,7 +86,7 @@ export const useKitchen = () => {
   }, []);
 
   const removeOrder = useCallback((queueCode: string) => {
-    setOrders(prev => prev.filter(order => order.queue_code !== queueCode));
+    setOrders(prev => prev.filter(order => order.data?.queue_code !== queueCode));
   }, []);
 
   const clearError = useCallback(() => {
