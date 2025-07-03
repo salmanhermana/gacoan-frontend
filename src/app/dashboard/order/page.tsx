@@ -2,12 +2,12 @@
 
 import React from 'react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import MenuContainer from './container/MenuContainer';
+import OrderContainer from './container/OrderContainer';
 
-export default function MenuDashboard() {
+export default function OrderDashboard() {
   return (
     <DashboardLayout>
-      <MenuContainer />
+      <OrderContainer />
     </DashboardLayout>
   );
 }

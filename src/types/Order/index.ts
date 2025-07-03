@@ -4,10 +4,7 @@ export interface MenuSummary {
 }
 
 export interface OrderItem {
-  menu: {
-    id: string;
-    name: string;
-  };
+  menu: MenuSummary;
   quantity: number;
 }
 
@@ -16,9 +13,18 @@ export interface QueueData {
   orders: OrderItem[];
 }
 
-export interface QueueDataWithStatus extends QueueData {
-  status: 'pending' | 'cooking' | 'ready';
-  timestamp: string;
+// Untuk respons umum dari endpoint Get Lowest Queue dan Start Cooking
+export interface QueueResponse {
+  status: string;
+  message: string;
+  data: QueueData;
+}
+
+// Untuk respons dari Finish Cooking (data null)
+export interface BasicResponse {
+  status: string;
+  message: string;
+  data: null;
 }
 
 export interface QueueDataWaiter {
@@ -28,22 +34,4 @@ export interface QueueDataWaiter {
     id: string;
     table_number: string;
   };
-}
-
-export interface QueueResponse {
-  status: string;
-  message: string;
-  data: QueueData;
-}
-
-export interface BasicResponse {
-  status: string;
-  message: string;
-  data: null;
-}
-
-export interface KitchenOrder {
-  data: QueueData;
-  status: 'pending' | 'cooking' | 'ready';
-  timestamp: string;
 }

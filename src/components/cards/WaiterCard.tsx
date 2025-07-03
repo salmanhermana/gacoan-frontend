@@ -1,67 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
-import { QueueDataWaiter } from '@/types/Order';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import React, { useState, useEffect } from 'react';
+import { OrderItem } from '@/types/Order';
+import { Button } from '@/components/ui/button';
 
-interface WaiterCardProps {
-  order: QueueDataWaiter;
-  onStartDelivering: (queueCode: string) => Promise<void>;
-  onFinishServing: (queueCode: string) => Promise<void>;
-  loading: boolean;
+interface WaiterOrderCardProps {
+  queue_code: string;
+  orders: OrderItem[];
+  tableNumber: string;
+  onFinishServing: (queueCode: string) => void;
+  isLoading?: boolean;
 }
 
-const WaiterCard: React.FC<WaiterCardProps> = ({ order, onStartDelivering, onFinishServing, loading }) => {
-  const [showConfirm, setShowConfirm] = useState(false);
+const WaiterOrderCard: React.FC<WaiterOrderCardProps> = ({
+  queue_code,
+  orders,
+  tableNumber,
+  onFinishServing,
+  isLoading = false,
+}) => {
+  const [timestamp, setTimestamp] = useState<string>('');
 
-  const handleConfirm = () => {
-    onFinishServing(order.queue_code);
-    setShowConfirm(false);
-  };
+  useEffect(() => {
+    const now = new Date();
+    setTimestamp(now.toLocaleTimeString('id-ID', { hour12: false }));
+  }, []);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800">
-          Antrian #{order.queue_code}
-        </h2>
-        <span className="text-sm font-medium text-gray-600">
-          Meja {order.table.table_number}
-        </span>
+    <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Order #{queue_code}</h2>
+        <span className="text-sm text-gray-500">Meja {tableNumber}</span>
       </div>
 
-      <ul className="mb-4 space-y-1">
-        {order.orders.map((item, idx) => (
-          <li key={idx} className="text-gray-700 text-sm">
-            {item.menu.name} x {item.quantity}
-          </li>
+      <ul className="text-sm text-gray-700 space-y-1">
+        {orders.map((item, index) => (
+          <li key={index}>• {item.menu.name} x{item.quantity}</li>
         ))}
       </ul>
 
-      <button
-        onClick={() => setShowConfirm(true)}
-        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md font-semibold"
+      <Button
+        onClick={() => onFinishServing(queue_code)}
+        disabled={isLoading}
+        className="w-full bg-green-600 hover:bg-green-700 text-white"
       >
-        Antar ke Meja
-      </button>
-
-      <button
-      onClick={() => onStartDelivering(order.queue_code)}
-      disabled={loading}
-      className="btn btn-outline-primary"
-      >
-        Mulai Antar
-      </button>
-
-      <ConfirmationModal
-        isOpen={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        onConfirm={handleConfirm}
-        title="Konfirmasi Pengantaran"
-        message={`Apakah Anda yakin ingin mengantar pesanan ${order.queue_code} ke meja ${order.table.table_number}?`}
-      />
+        {isLoading ? 'Memproses...' : 'Antar ke Meja'}
+      </Button>
     </div>
   );
 };
 
-export default WaiterCard;
+export default WaiterOrderCard;

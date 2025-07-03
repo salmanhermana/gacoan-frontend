@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Menu } from '@/types/menu/menu';
+import { Menu } from '@/types/Menu/menu';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import Image from 'next/image';
 
 interface MenuCardProps {
   item: Menu;
   onToggleAvailability: (id: string, isAvailable: boolean) => void;
-  loading?: boolean;
 }
 
 const MenuCard: React.FC<MenuCardProps> = ({ item, onToggleAvailability }) => {
@@ -36,7 +35,7 @@ const MenuCard: React.FC<MenuCardProps> = ({ item, onToggleAvailability }) => {
           <div className="text-sm text-gray">{item.description}</div>
           <div className="text-sm text-gray">Rp {item.price}</div>
           <button
-            onClick={() => onToggleAvailability(item.id, !item.is_available)}
+            onClick={handleToggle}
             className={`w-full rounded h-6 flex items-center justify-center px-[22px] text-sm font-poppins font-semibold text-whitesmoke-100 ${item.is_available ? 'bg-mediumspringgreen' : 'bg-crimson'}`}
           >
             {item.is_available ? 'Item Available' : 'Item Unavailable'}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useKitchen  } from '@/app/hooks/useKitchen';
+import { useKitchen  } from '@/lib/hooks/useKitchen';
 
 interface ToggleButtonProps {
   menuId: string;
