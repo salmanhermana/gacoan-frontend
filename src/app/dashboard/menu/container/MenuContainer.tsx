@@ -3,7 +3,12 @@
 import React, { useState } from "react";
 import { useKitchen } from "@/app/hooks/useKitchen";
 import MenuCard from "@/components/cards/MenuCard";
-import  useGetAllCategories  from "@/app/hooks/useGetAllCategories";
+
+const categories = [
+  { id: "makanan", name: "Makanan" },
+  { id: "minuman", name: "Minuman" },
+  { id: "dessert", name: "Dessert" },
+];
 
 const MenuContainer: React.FC = () => {
   const {
@@ -14,14 +19,11 @@ const MenuContainer: React.FC = () => {
     loading,
   } = useKitchen();
 
-  const { data: categories = [] } = useGetAllCategories();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    categories[0]?.id || null
-  );
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(categories[0].id);
 
-  const filteredItems = selectedCategoryId
-    ? menuItems.filter((item) => item.category?.id === selectedCategoryId)
-    : menuItems;
+  const filteredItems = menuItems.filter(
+    (item) => item.category?.id === selectedCategoryId
+  );
 
   return (
     <div className="flex flex-col gap-6">

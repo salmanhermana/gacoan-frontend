@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { kitchenApi } from '@/lib/api/kitchen';
-import { OrderItem, QueueData } from '@/types/Order';
+import { QueueData } from '@/types/Order';
 import useGetAllMenus from '@/app/hooks/useGetAllMenus';
 
 interface KitchenOrder {
@@ -15,7 +15,7 @@ export const useKitchen = () => {
     isLoading,
     isError,
     error,
-    refetch: refetchMenus
+    refetch: refetchMenus,
   } = useGetAllMenus();
 
   const [orders, setOrders] = useState<KitchenOrder[]>([]);
@@ -26,9 +26,15 @@ export const useKitchen = () => {
     try {
       setLoading(true);
       setInternalError(null);
-      const response = await kitchenApi.getLowestQueueMenu();
+      const response = await kitchenApi.getNextOrder();
       if (response) {
-        setOrders([response]);
+        setOrders([
+          {
+            data: response,
+            status: 'pending',
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       } else {
         setOrders([]);
       }
@@ -39,59 +45,59 @@ export const useKitchen = () => {
     }
   }, []);
 
-  const toggleMenuAvailability = useCallback(async (menuId: string, isAvailable: boolean) => {
-    try {
-      await kitchenApi.changeMenuAvailability(menuId, isAvailable);
-      await refetchMenus();
-    } catch (err) {
-      setInternalError(err instanceof Error ? err.message : 'Gagal memperbarui status menu');
-    }
-  }, [refetchMenus]);
-
-  const updateOrderStatus = useCallback(async (queueCode: string, newStatus: 'cooking' | 'ready') => {
-    try {
-      let updated;
-      if (newStatus === 'cooking') {
-        updated = await kitchenApi.startCooking(queueCode);
-      } else {
-        await kitchenApi.finishCooking(queueCode);
-        updated = undefined;
+  const toggleMenuAvailability = useCallback(
+    async (menuId: string, isAvailable: boolean) => {
+      try {
+        await kitchenApi.changeMenuAvailability(menuId, isAvailable);
+        await refetchMenus();
+      } catch (err) {
+        setInternalError(
+          err instanceof Error ? err.message : 'Gagal memperbarui status menu'
+        );
       }
-      setOrders(prev =>
-        prev.map(order =>
-          order.data.queue_code === queueCode && updated
-            ? updated
-            : order
-        ).filter(Boolean)
-      );
-    } catch (err) {
-      setInternalError(err instanceof Error ? err.message : 'Gagal memperbarui status order');
-    }
-  }, []);
+    },
+    [refetchMenus]
+  );
+
+  const updateOrderStatus = useCallback(
+    async (queueCode: string, newStatus: 'cooking' | 'ready') => {
+      try {
+        let updated;
+        if (newStatus === 'cooking') {
+          updated = await kitchenApi.startCooking(queueCode);
+        } else {
+          await kitchenApi.finishCooking(queueCode);
+          updated = undefined;
+        }
+        if (updated) {
+          setOrders((prev) =>
+            prev.map((order) =>
+              order.data.queue_code === queueCode
+                ? {
+                    data: updated,
+                    status: newStatus,
+                    timestamp: new Date().toISOString(),
+                  }
+                : order
+            )
+          );
+        }
+      } catch (err) {
+        setInternalError(
+          err instanceof Error ? err.message : 'Gagal memperbarui status order'
+        );
+      }
+    },
+    []
+  );
 
   const removeOrder = useCallback((queueCode: string) => {
-    setOrders(prev => prev.filter(order => order.data.queue_code !== queueCode));
+    setOrders((prev) =>
+      prev.filter((order) => order.data.queue_code !== queueCode)
+    );
   }, []);
 
   const clearError = useCallback(() => setInternalError(null), []);
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      setOrders([
-        {
-          data: {
-            queue_code: 'ORD-001',
-            orders: [
-              { menu: { id: 'm1', name: 'Mie Gacoan' }, quantity: 2 },
-              { menu: { id: 'm2', name: 'Teh Manis' }, quantity: 1 },
-            ]
-          },
-          status: 'pending',
-          timestamp: '12:00:00'
-        }
-      ]);
-    }
-  }, []);
 
   return {
     menuItems,
@@ -103,6 +109,6 @@ export const useKitchen = () => {
     updateOrderStatus,
     removeOrder,
     setError: clearError,
-    refetchMenus
+    refetchMenus,
   };
 };

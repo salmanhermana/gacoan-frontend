@@ -1,5 +1,5 @@
 import { Menu } from '@/types/menu/menu';
-import { KitchenOrder, QueueData, QueueDataWaiter } from '@/types/Order';
+import { QueueData, QueueDataWaiter } from '@/types/Order';
 import { getAuthHeader } from '@/lib/auth/getAuthHeader';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -17,13 +17,14 @@ export const kitchenApi = {
     return data.data || [];
   },
 
-  async toggleAvailability(menuId: string): Promise<Menu> {
+  async changeMenuAvailability(menuId: string, isAvailable: boolean): Promise<Menu> {
     const response = await fetch(`${API_BASE_URL}/menu/${menuId}/availability`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader(),
       },
+      body: JSON.stringify({ is_available: isAvailable }),
     });
     if (!response.ok) throw new Error('Failed to update menu availability');
     const data = await response.json();
@@ -107,5 +108,5 @@ export const kitchenApi = {
       body: JSON.stringify({ queue_code: queueCode }),
     });
     if (!response.ok) throw new Error('Failed to start delivering');
-  }
+  },
 };
