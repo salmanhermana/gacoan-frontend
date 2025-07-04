@@ -22,28 +22,32 @@ export const useKitchen = () => {
   const [loading, setLoading] = useState(false);
   const [internalError, setInternalError] = useState<string | null>(null);
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      setInternalError(null);
-      const response = await kitchenApi.getNextOrder();
-      if (response) {
-        setOrders([
-          {
-            data: response,
-            status: 'pending',
-            timestamp: new Date().toISOString(),
-          },
-        ]);
-      } else {
-        setOrders([]);
-      }
-    } catch (err) {
-      setInternalError(err instanceof Error ? err.message : 'Gagal mengambil antrian');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+const fetchOrders = useCallback(async () => {
+  try {
+    const data = await kitchenApi.getNextOrder();
+
+    console.log('🎯 Data dari API:', data);
+
+  if (data?.queue_code && data?.orders && Array.isArray(data.orders) && data.orders.length > 0) {
+    const kitchenOrder: KitchenOrder = {
+      data,
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+    };
+    setOrders([kitchenOrder]);
+  } else {
+    console.warn('⚠️ Data order tidak valid:', data);
+    setOrders([]);
+  }
+  } catch (err) {
+    setInternalError(
+      err instanceof Error ? err.message : 'Gagal mengambil order'
+    );
+    console.error('❌ Gagal fetch order:', err);
+    setOrders([]);
+  }
+}, []);
+
 
   const toggleMenuAvailability = useCallback(
     async (menuId: string, isAvailable: boolean) => {
@@ -62,19 +66,19 @@ export const useKitchen = () => {
   const updateOrderStatus = useCallback(
     async (queueCode: string, newStatus: 'cooking' | 'ready') => {
       try {
-        let updated;
+        let updatedOrder: QueueData | undefined;
         if (newStatus === 'cooking') {
-          updated = await kitchenApi.startCooking(queueCode);
+          updatedOrder = await kitchenApi.startCooking(queueCode);
         } else {
           await kitchenApi.finishCooking(queueCode);
-          updated = undefined;
         }
-        if (updated) {
+
+        if (updatedOrder) {
           setOrders((prev) =>
             prev.map((order) =>
               order.data.queue_code === queueCode
                 ? {
-                    data: updated,
+                    data: updatedOrder,
                     status: newStatus,
                     timestamp: new Date().toISOString(),
                   }

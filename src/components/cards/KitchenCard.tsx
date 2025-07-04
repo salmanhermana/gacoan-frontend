@@ -25,19 +25,32 @@ const OrderCard: React.FC<OrderCardProps> = ({
     if (order.status === 'pending') {
       const timer = setInterval(() => {
         const now = new Date();
-        const created = new Date(); // simulasi
+        const created = new Date(order.timestamp || new Date()); // fallback kalau timestamp tidak ada
         const diff = Math.floor((now.getTime() - created.getTime()) / 60000);
         setTimeElapsed(diff);
       }, 60000);
 
       return () => clearInterval(timer);
     }
-  }, [order.status, onRemoveOrder, order.data.queue_code]);
+  }, [order.status, order.timestamp]);
 
   const handleStatusUpdate = (newStatus: 'cooking' | 'ready') => {
+    const queueCode = order?.data?.queue_code;
+    if (!queueCode) {
+      console.warn('Queue code not available in order.data');
+      return;
+    }
+    console.log('Starting cooking with queue_code:', queueCode);
     setPendingAction(newStatus);
-    onUpdateStatus(order.data.queue_code, newStatus);
+    onUpdateStatus(queueCode, newStatus);
   };
+
+  const items = Array.isArray(order?.data?.orders) ? order.data.orders : [];
+
+  if (!order?.data?.queue_code) {
+  console.warn('❌ Invalid order data:', order);
+  return null;
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex flex-col gap-4">
@@ -52,12 +65,16 @@ const OrderCard: React.FC<OrderCardProps> = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        {order.data.orders.map((item, index) => (
-          <div key={index} className="flex justify-between text-sm">
-            <span>{item.menu.name}</span>
-            <span>x{item.quantity}</span>
-          </div>
-        ))}
+        {order?.data?.orders?.length > 0 ? (
+          order.data.orders.map((item, index) => (
+            <div key={index} className="flex justify-between text-sm">
+              <span>{item.menu.name}</span>
+              <span>x{item.quantity}</span>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">Tidak ada item dalam pesanan</p>
+        )}
       </div>
 
       <div>
