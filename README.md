@@ -1,40 +1,132 @@
-[**Dokumen FP Kelompok 7**](https://drive.google.com/file/d/1pvrBNacUcCM_Vs9nj4ThdDpkH-ErhTYz/view?usp=sharing)
+# Sistem Aplikasi Pemesanan Makanan Digital untuk Meningkatkan Efisiensi Layanan Dine-In di Restoran
 
----
+| Nama                          | NRP        | Role     |
+| ----------------------------- | ---------- | -------- |
+| Muhammad Budhi Salmanjannah   | 5025201084 | Frontend |
+| Ainun Nadhifah Syamsiyah      | 5025221053 | Backend  |
+| Fawwas Aldy Nurramdhan Kaisar | 5025221179 | Backend  |
+| Muammar Bahalwan              | 5053231020 | Frontend |
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🍽️ Gambaran Umum
 
-## Getting Started
+Aplikasi sistem pemesanan makanan untuk restoran dine-in dirancang untuk meningkatkan efisiensi layanan dan kenyamanan pelanggan. Melalui pemindaian QR code di meja, pelanggan dapat langsung mengakses menu digital, memilih makanan berdasarkan ketersediaan dan kategori, serta melakukan pembayaran tanpa perlu menunggu pelayan. Sistem ini juga mendukung alur kerja dapur dan pelayan dengan fitur pelacakan pesanan secara real-time dan pengelolaan antrian pesanan.
 
-First, run the development server:
+Tujuan utama dari sistem ini adalah menyediakan pengalaman pemesanan yang cepat, akurat, dan terintegrasi antar peran pengguna seperti pelanggan, staf dapur, dan pelayan. Arsitektur perangkat lunak yang dibangun harus mengutamakan keandalan, skalabilitas, dan kemudahan penggunaan, dengan harapan dapat mempercepat proses layanan, mengurangi kesalahan operasional, dan meningkatkan kepuasan semua pihak yang terlibat.
+
+Laporan selengkapnya dapat dilihat di [sini](https://drive.google.com/file/d/1pvrBNacUcCM_Vs9nj4ThdDpkH-ErhTYz/view?usp=sharing).
+
+## 🚀 Fitur
+
+### 🔐 Autentikasi & Otorisasi
+
+- Autentikasi berbasis JWT
+- Kontrol akses berbasis peran (RBAC)
+- Berbagai peran pengguna: Pelanggan, Dapur, Pelayan, Super Admin
+
+### 📋 Manajemen Pesanan
+
+- Manajemen siklus hidup pesanan lengkap
+- Pelacakan status pesanan real-time
+- Manajemen antrian dengan kode antrian unik
+- Riwayat pesanan dan pagination
+
+### 👨‍🍳 Operasi Dapur
+
+- **Mulai Memasak**: Memulai persiapan makanan
+- **Selesai Memasak**: Menandai pesanan siap disajikan
+- **Pesanan Berikutnya**: Mendapatkan pesanan berikutnya dalam antrian
+- Pelacakan waktu memasak dan deteksi keterlambatan
+
+### 🍽️ Operasi Pelayan
+
+- **Siap Disajikan**: Melihat pesanan siap untuk pengiriman
+- **Mulai Mengantar**: Memulai pengiriman makanan
+- **Selesai Mengantar**: Menyelesaikan pengiriman pesanan
+- Pembaruan status pesanan real-time
+
+### 💳 Pemrosesan Pembayaran
+
+- Integrasi gateway pembayaran Midtrans
+- Pelacakan status pembayaran
+- Penanganan webhook untuk pembaruan pembayaran
+- Pemrosesan transaksi yang aman
+
+### 📊 Manajemen Menu
+
+- Organisasi menu berbasis kategori
+- Manajemen ketersediaan menu
+- Manajemen harga dengan presisi desimal
+- Operasi CRUD item menu
+
+### 🏢 Manajemen Restoran
+
+- Manajemen meja
+- Manajemen pengguna
+- Riwayat transaksi
+- Pelaporan komprehensif
+
+## 🛠️ Stack Teknologi
+
+- **Bahasa**: Typescript
+- **Framework**: NextJs
+- **State & Data**: React Query untuk data fetching, caching, dan pengelolaan status
+- **Autentikasi**: JWT
+- **Gateway Pembayaran**: Midtrans
+
+## 📋 Prasyarat
+
+- Node.js versi 18.x atau lebih tinggi
+- NextJs versi 15.x
+- Git
+
+## 🚀 Instalasi & Setup
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/salmanhermana/gacoan-frontend
+cd gacoan-frontend
+```
+
+### 2. Instalasi Dependensi
+
+```bash
+npm i
+```
+
+### 3. Konfigurasi Environment
+
+Salin dan isi file `.env.example` menjadi `.env` di direktori root:
+
+### 4. Jalankan Aplikasi
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Server akan berjalan di `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👥 Peran Pengguna & Izin
 
-## Learn More
+### 🛒 Pelanggan
 
-To learn more about Next.js, take a look at the following resources:
+- Membuat transaksi
+- Melihat riwayat transaksi sendiri
+- Melakukan pembayaran
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 👨‍🍳 Dapur
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Melihat pesanan berikutnya dalam antrian
+- Mulai/selesai memasak pesanan
+- Melihat detail pesanan
 
-## Deploy on Vercel
+### 🍽️ Pelayan
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Melihat pesanan siap disajikan
+- Mulai/selesai mengantar pesanan
+- Memperbarui status pesanan
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Lainnya
+
+Repository backend dapat dilihat di [sini](https://github.com/ainunns/gacoan-backend/).
