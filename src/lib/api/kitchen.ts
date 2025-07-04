@@ -2,7 +2,8 @@ import { Menu } from '@/types/menu/menu';
 import { QueueData, QueueDataWaiter } from '@/types/Order';
 import { getAuthHeader } from '@/lib/auth/getAuthHeader';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL_DEV;
+console.log("BASE_URL ENV:", process.env.NEXT_PUBLIC_API_URL_DEV);
 
 export const kitchenApi = {
   async getAllMenu(): Promise<Menu[]> {
@@ -17,18 +18,24 @@ export const kitchenApi = {
     return data.data || [];
   },
 
-  async changeMenuAvailability(menuId: string, isAvailable: boolean): Promise<Menu> {
-    const response = await fetch(`${API_BASE_URL}/menu/${menuId}/availability`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify({ is_available: isAvailable }),
-    });
-    if (!response.ok) throw new Error('Failed to update menu availability');
-    const data = await response.json();
-    return data.data;
+ async changeMenuAvailability(menuId: string, isAvailable: boolean): Promise<Menu> {
+  const url = `${API_BASE_URL}/menu/${menuId}/availability`;
+
+  console.log("BASE_URL =>", API_BASE_URL);
+  console.log("PATCHing to:", url);
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify({ is_available: isAvailable }),
+  });
+
+  if (!response.ok) throw new Error('Failed to update menu availability');
+  const data = await response.json();
+  return data.data;
   },
 
   async getNextOrder(): Promise<QueueData | null> {

@@ -17,7 +17,7 @@ const baseURL =
     : process.env.NEXT_PUBLIC_API_URL_PROD;
 
 if (!baseURL) {
-  throw new Error("❌ BASE_URL is undefined. Check your .env.local file.");
+  throw new Error(" BASE_URL is undefined. Check your .env.local file.");
 }
 
 const api = axios.create({
@@ -30,7 +30,6 @@ const api = axios.create({
 
 const isBrowser = typeof window !== "undefined";
 
-// REQUEST INTERCEPTOR
 api.interceptors.request.use((config) => {
   if (config.headers) {
     let token: string | undefined;
@@ -56,7 +55,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// RESPONSE INTERCEPTOR
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
