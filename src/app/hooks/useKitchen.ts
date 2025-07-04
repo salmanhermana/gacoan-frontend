@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { kitchenApi } from '@/lib/api/kitchen';
 import { QueueData } from '@/types/Order';
 import useGetAllMenus from '@/app/hooks/useGetAllMenus';
 
-interface KitchenOrder {
+interface KitchenItem {
   data: QueueData;
   status: 'pending' | 'cooking' | 'ready';
   timestamp: string;
@@ -18,36 +18,40 @@ export const useKitchen = () => {
     refetch: refetchMenus,
   } = useGetAllMenus();
 
-  const [orders, setOrders] = useState<KitchenOrder[]>([]);
+  const [kitchen, setKitchen] = useState<KitchenItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [internalError, setInternalError] = useState<string | null>(null);
 
-const fetchOrders = useCallback(async () => {
-  try {
-    const data = await kitchenApi.getNextOrder();
+  const fetchKitchen = useCallback(async () => {
+    try {
+      const data = await kitchenApi.getNextOrder();
 
-    console.log('🎯 Data dari API:', data);
+      console.log('🎯 Data dari API:', data);
 
-  if (data?.queue_code && data?.orders && Array.isArray(data.orders) && data.orders.length > 0) {
-    const kitchenOrder: KitchenOrder = {
-      data,
-      status: 'pending',
-      timestamp: new Date().toISOString(),
-    };
-    setOrders([kitchenOrder]);
-  } else {
-    console.warn('⚠️ Data order tidak valid:', data);
-    setOrders([]);
-  }
-  } catch (err) {
-    setInternalError(
-      err instanceof Error ? err.message : 'Gagal mengambil order'
-    );
-    console.error('❌ Gagal fetch order:', err);
-    setOrders([]);
-  }
-}, []);
-
+      if (
+        data?.queue_code &&
+        data?.orders &&
+        Array.isArray(data.orders) &&
+        data.orders.length > 0
+      ) {
+        const kitchenItem: KitchenItem = {
+          data,
+          status: 'pending',
+          timestamp: new Date().toISOString(),
+        };
+        setKitchen([kitchenItem]);
+      } else {
+        console.warn('⚠️ Data order tidak valid:', data);
+        setKitchen([]);
+      }
+    } catch (err) {
+      setInternalError(
+        err instanceof Error ? err.message : 'Gagal mengambil order'
+      );
+      console.error('❌ Gagal fetch order:', err);
+      setKitchen([]);
+    }
+  }, []);
 
   const toggleMenuAvailability = useCallback(
     async (menuId: string, isAvailable: boolean) => {
@@ -63,26 +67,29 @@ const fetchOrders = useCallback(async () => {
     [refetchMenus]
   );
 
-  const updateOrderStatus = useCallback(
+  const updateKitchenStatus = useCallback(
     async (queueCode: string, newStatus: 'cooking' | 'ready') => {
       try {
-        let updatedOrder: QueueData | undefined;
+        let updatedData: QueueData | undefined;
+
         if (newStatus === 'cooking') {
-          updatedOrder = await kitchenApi.startCooking(queueCode);
+          updatedData = await kitchenApi.startCooking(queueCode);
         } else {
           await kitchenApi.finishCooking(queueCode);
+          const existing = kitchen.find(item => item.data.queue_code === queueCode);
+          updatedData = existing?.data;
         }
 
-        if (updatedOrder) {
-          setOrders((prev) =>
-            prev.map((order) =>
-              order.data.queue_code === queueCode
+        if (updatedData) {
+          setKitchen(prev =>
+            prev.map(item =>
+              item.data.queue_code === queueCode
                 ? {
-                    data: updatedOrder,
+                    data: updatedData!,
                     status: newStatus,
                     timestamp: new Date().toISOString(),
                   }
-                : order
+                : item
             )
           );
         }
@@ -92,12 +99,12 @@ const fetchOrders = useCallback(async () => {
         );
       }
     },
-    []
+    [kitchen]
   );
 
-  const removeOrder = useCallback((queueCode: string) => {
-    setOrders((prev) =>
-      prev.filter((order) => order.data.queue_code !== queueCode)
+  const removeKitchenItem = useCallback((queueCode: string) => {
+    setKitchen(prev =>
+      prev.filter(item => item.data.queue_code !== queueCode)
     );
   }, []);
 
@@ -105,13 +112,13 @@ const fetchOrders = useCallback(async () => {
 
   return {
     menuItems,
-    orders,
+    kitchen,
     loading: loading || isLoading,
     error: internalError || (isError ? String(error) : null),
-    fetchOrders,
+    fetchKitchen,
     toggleMenuAvailability,
-    updateOrderStatus,
-    removeOrder,
+    updateKitchenStatus,
+    removeKitchenItem,
     setError: clearError,
     refetchMenus,
   };
