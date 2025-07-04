@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Sistem Aplikasi Pemesanan Makanan Digital untuk Meningkatkan Efisiensi Layanan Dine-In di Restoran
 
 | Nama                          | NRP        | Role     |
@@ -97,7 +96,7 @@ npm i
 
 ### 3. Konfigurasi Environment
 
-Salin dan isi file `.env.example` menjadi `.env` di direktori root:
+Salin dan isi file `.env.example` menjadi `.env` di direktori root
 
 ### 4. Jalankan Aplikasi
 
@@ -131,6 +130,3 @@ Server akan berjalan di `http://localhost:3000`
 ## Lainnya
 
 Repository backend dapat dilihat di [sini](https://github.com/ainunns/gacoan-backend/).
-=======
-[**Dokumen FP Kelompok 7**](https://drive.google.com/file/d/1pvrBNacUcCM_Vs9nj4ThdDpkH-ErhTYz/view?usp=sharing)
->>>>>>> fabeebc564f81924444247b30d5cb7e59202c0e0
