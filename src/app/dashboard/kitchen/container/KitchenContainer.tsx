@@ -6,36 +6,20 @@ import { useKitchen } from '@/app/hooks/useKitchen';
 
 const KitchenContainer: React.FC = () => {
   const {
-    orders = [],
-    fetchOrders,
-    updateOrderStatus,
-    removeOrder,
+    kitchen = [],
+    fetchKitchen,
+    updateKitchenStatus,
+    removeKitchenItem,
     error,
     setError,
     loading
   } = useKitchen();
 
   useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 30000);
+    fetchKitchen();
+    const interval = setInterval(fetchKitchen, 30000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
-
-  {Array.isArray(orders) && orders.map((order, index) => {
-  console.log('🧪 order in container:', order);
-
-  const orderNumber = parseInt(order.data?.queue_code?.replace(/\D/g, '')) || index + 1;
-
-  return (
-    <OrderCard
-      key={order.data?.queue_code || `order-${index}`}
-      order={order}
-      orderNumber={orderNumber}
-      onUpdateStatus={updateOrderStatus}
-      onRemoveOrder={removeOrder}
-    />
-  );
-})}
+  }, [fetchKitchen]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -51,26 +35,28 @@ const KitchenContainer: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {orders.map((order, index) => {
-          const orderNumber =
-            parseInt(order?.data?.queue_code?.replace(/\D/g, '')) || index + 1;
-
-          return (
-            <OrderCard
-              key={order.data?.queue_code || index}
-              order={order}
-              orderNumber={orderNumber}
-              onUpdateStatus={updateOrderStatus}
-              onRemoveOrder={removeOrder}
-            />
-          );
-        })}
-      </div>
-
-      {!loading && orders.length === 0 && (
+      {loading ? (
+        <div className="text-center text-gray-500 py-12">Memuat order...</div>
+      ) : kitchen.length === 0 ? (
         <div className="text-center text-gray-500 py-12">
           Tidak ada order dalam antrian.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {kitchen.map((item, index) => {
+            const orderNumber =
+              parseInt(item?.data?.queue_code?.replace(/\D/g, '')) || index + 1;
+
+            return (
+              <OrderCard
+                key={item.data?.queue_code ?? `fallback-${index}`}
+                order={item}
+                orderNumber={orderNumber}
+                onUpdateStatus={updateKitchenStatus}
+                onRemoveOrder={removeKitchenItem}
+              />
+            );
+          })}
         </div>
       )}
     </div>
