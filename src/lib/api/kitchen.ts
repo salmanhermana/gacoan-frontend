@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const kitchenApi = {
   async getAllMenu(): Promise<Menu[]> {
-    const response = await fetch(`${API_BASE_URL}/menu`, {
+    const response = await fetch(`${API_BASE_URL}/menu/`, {
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader(),

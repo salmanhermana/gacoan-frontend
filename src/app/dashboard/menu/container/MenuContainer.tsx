@@ -1,50 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { useKitchen } from "@/app/hooks/useKitchen";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import MenuCard from "@/components/cards/MenuCard";
+import useGetAllMenus from "@/app/hooks/useGetAllMenus";
+import useGetAllCategories from "@/app/hooks/useGetAllCategories";
+import { useKitchen } from "@/app/hooks/useKitchen";
 
-const categories = [
-  { id: "makanan", name: "Makanan" },
-  { id: "minuman", name: "Minuman" },
-  { id: "dessert", name: "Dessert" },
-];
+const MenuContainer = () => {
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-const MenuContainer: React.FC = () => {
-  const {
-    menuItems,
-    toggleMenuAvailability,
-    error,
-    setError,
-    loading,
-  } = useKitchen();
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(categories[0].id);
-
-  const filteredItems = menuItems.filter(
-    (item) => item.category?.id === selectedCategoryId
-  );
+  const { data: categories = [] } = useGetAllCategories();
+  const { data: menuItems = [], isLoading } = useGetAllMenus(selectedCategoryId ?? undefined);
+  const { toggleMenuAvailability, loading } = useKitchen();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="bg-white shadow-md rounded flex overflow-x-auto">
+    <section className="space-y-6">
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        <Button
+          variant={selectedCategoryId === null ? "default" : "outline"}
+          onClick={() => setSelectedCategoryId(null)}
+        >
+          Semua
+        </Button>
         {categories.map((category) => (
-          <button
+          <Button
             key={category.id}
+            variant={selectedCategoryId === category.id ? "default" : "outline"}
             onClick={() => setSelectedCategoryId(category.id)}
-            className={`w-full py-4 font-semibold border-b-4 text-center whitespace-nowrap px-4 ${
-              selectedCategoryId === category.id
-                ? "text-tomato border-tomato"
-                : "text-gray-500 border-transparent"
-            }`}
           >
             {category.name}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {filteredItems.map((item) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {menuItems.map((item) => (
           <MenuCard
             key={item.id}
             item={item}
@@ -53,7 +44,7 @@ const MenuContainer: React.FC = () => {
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

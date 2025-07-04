@@ -1,17 +1,26 @@
-import axios, { AxiosError } from "axios";
-import { GetServerSidePropsContext } from "next/types";
-import Cookies from "universal-cookie";
+// File: lib/api.ts
 
+import axios, { AxiosError } from "axios";
+import { GetServerSidePropsContext } from "next";
+import Cookies from "universal-cookie";
 import { getToken } from "@/lib/cookies";
 
-const context = <GetServerSidePropsContext>{};
+let context: GetServerSidePropsContext | undefined;
 
-export const baseURL =
+export function setApiContext(ctx: GetServerSidePropsContext) {
+  context = ctx;
+}
+
+const baseURL =
   process.env.NEXT_PUBLIC_RUN_MODE === "development"
     ? process.env.NEXT_PUBLIC_API_URL_DEV
     : process.env.NEXT_PUBLIC_API_URL_PROD;
 
-export const api = axios.create({
+if (!baseURL) {
+  throw new Error("❌ BASE_URL is undefined. Check your .env.local file.");
+}
+
+const api = axios.create({
   baseURL,
   headers: {
     "Content-Type": "application/json",
@@ -19,16 +28,19 @@ export const api = axios.create({
   withCredentials: false,
 });
 
-api.defaults.withCredentials = false;
 const isBrowser = typeof window !== "undefined";
 
-api.interceptors.request.use(function (config) {
+// REQUEST INTERCEPTOR
+api.interceptors.request.use((config) => {
   if (config.headers) {
     let token: string | undefined;
 
     if (!isBrowser) {
-      if (!context)
-        throw "Api Context not found. You must call `setApiContext(context)` before calling api on server-side";
+      if (!context) {
+        throw new Error(
+          "Api Context not found. Call `setApiContext(context)` before using API on the server"
+        );
+      }
 
       const cookies = new Cookies(context.req?.headers.cookie);
       token = cookies.get("gacoan_token");
@@ -36,26 +48,25 @@ api.interceptors.request.use(function (config) {
       token = getToken();
     }
 
-    config.headers.Authorization = token ? `Bearer ${token}` : "";
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   return config;
 });
 
+// RESPONSE INTERCEPTOR
 api.interceptors.response.use(
   (response) => response,
-
   (error: AxiosError) => {
-      const data: any = error.response?.data ?? {};
+    const data: any = error.response?.data ?? {};
+    const backendMessage =
+      data.error || data.message || error.message || "Unknown error occurred";
 
-      const backendMessage =
-      data.error ||
-      data.message ||
-      error.message; 
-
-      error.message = backendMessage;
-
+    error.message = backendMessage;
     return Promise.reject(error);
   }
 );
+
 export default api;
